@@ -1,3 +1,5 @@
-NEXT_PUBLIC_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-NEXT_PUBLIC_HOUSEHOLD_KEY=martel-family-change-this-to-a-long-random-value
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true
+};
+export default nextConfig;
