@@ -1,74 +1,23 @@
-import { AppData } from "./types";
+import type { HouseholdSnapshot } from "./domain";
 
 export const DAYS = [
-  "Monday", "Tuesday", "Wednesday", "Thursday",
-  "Friday", "Saturday", "Sunday"
-];
+  "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+] as const;
 
-export const seedData: AppData = {
+export const seedData: HouseholdSnapshot = {
   monthlyBudget: 1400,
   meals: [
-    {
-      id: "sweet-meat",
-      name: "Korean Sweet Meat Bowls",
-      protein: "Ground beef or turkey",
-      sides: ["Rice", "Edamame", "Green onions"],
-      notes: "Use the family sweet-meat sauce.",
-      active: true
-    },
-    {
-      id: "tacos",
-      name: "Taco Night",
-      protein: "Ground beef or turkey",
-      sides: ["Rice or tortillas", "Lettuce", "Cheese", "Sour cream", "Salsa"],
-      active: true
-    },
-    {
-      id: "steak",
-      name: "Tenderloin Steak Dinner",
-      protein: "Sam's whole tenderloin steaks",
-      sides: ["Regular or sweet potatoes", "Green beans or broccoli"],
-      notes: "Use one frozen steak pack each week.",
-      active: true
-    },
-    {
-      id: "whole-chicken",
-      name: "Pressure Cooker Whole Chicken",
-      protein: "Whole chicken",
-      sides: ["Mashed potatoes", "Green beans"],
-      notes: "Save leftovers for quesadillas, soup, or sandwiches.",
-      active: true
-    },
-    {
-      id: "spaghetti",
-      name: "Spaghetti Night",
-      protein: "Ground beef or turkey",
-      sides: ["Salad", "Garlic bread"],
-      active: true
-    },
-    {
-      id: "grilled-chicken",
-      name: "Grilled Chicken Dinner",
-      protein: "Chicken breast",
-      sides: ["Broccoli", "Rice or potatoes"],
-      active: true
-    },
-    {
-      id: "pizza",
-      name: "Pizza Night",
-      protein: "Pizza",
-      sides: ["Salad or fruit"],
-      active: true
-    }
+    { id: "sweet-meat", name: "Korean Sweet Meat Bowls", protein: "Ground beef or turkey", sides: ["Rice", "Edamame", "Green onions"], notes: "Use the family sweet-meat sauce.", active: true },
+    { id: "tacos", name: "Taco Night", protein: "Ground beef or turkey", sides: ["Rice or tortillas", "Lettuce", "Cheese", "Sour cream", "Salsa"], active: true },
+    { id: "steak", name: "Tenderloin Steak Dinner", protein: "Sam's whole tenderloin steaks", sides: ["Regular or sweet potatoes", "Green beans or broccoli"], notes: "Use one frozen steak pack each week.", active: true },
+    { id: "whole-chicken", name: "Pressure Cooker Whole Chicken", protein: "Whole chicken", sides: ["Mashed potatoes", "Green beans"], notes: "Save leftovers for quesadillas, soup, or sandwiches.", active: true },
+    { id: "spaghetti", name: "Spaghetti Night", protein: "Ground beef or turkey", sides: ["Salad", "Garlic bread"], active: true },
+    { id: "grilled-chicken", name: "Grilled Chicken Dinner", protein: "Chicken breast", sides: ["Broccoli", "Rice or potatoes"], active: true },
+    { id: "pizza", name: "Pizza Night", protein: "Pizza", sides: ["Salad or fruit"], active: true }
   ],
   weeklyPlan: {
-    Monday: "sweet-meat",
-    Tuesday: "tacos",
-    Wednesday: "whole-chicken",
-    Thursday: "spaghetti",
-    Friday: "steak",
-    Saturday: "pizza",
-    Sunday: "grilled-chicken"
+    Monday: "sweet-meat", Tuesday: "tacos", Wednesday: "whole-chicken",
+    Thursday: "spaghetti", Friday: "steak", Saturday: "pizza", Sunday: "grilled-chicken"
   },
   groceries: [
     { id: "ground-turkey", name: "Ground turkey", category: "Meat", store: "Sam's Club", quantity: 1, checked: false, staple: true },
@@ -110,3 +59,16 @@ export const seedData: AppData = {
   ],
   budgetEntries: []
 };
+
+export function mergeSnapshot(value: unknown): HouseholdSnapshot {
+  const candidate = value as Partial<HouseholdSnapshot> | null;
+  return {
+    ...seedData,
+    ...(candidate || {}),
+    meals: candidate?.meals || seedData.meals,
+    weeklyPlan: candidate?.weeklyPlan || seedData.weeklyPlan,
+    groceries: candidate?.groceries || seedData.groceries,
+    inventory: candidate?.inventory || seedData.inventory,
+    budgetEntries: candidate?.budgetEntries || seedData.budgetEntries
+  };
+}
