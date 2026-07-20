@@ -6,13 +6,14 @@
 - Completed: split the existing screens into module boundaries.
 - Completed: isolate the legacy Supabase snapshot behind one compatibility service.
 - Completed: remove existing encoding artifacts and add a typecheck command.
-- Next release gate: run two-session regression against a preview deployment.
+- Completed: true Allan/Stefanie, bidirectional, two-session production regression.
 
 ## Phase 2 — identity, households, and normalized grocery data
 
+- In progress: additive household bootstrap and normalized shadow schema.
 - Create the Martel household and attach both existing accounts.
-- Deploy and adversarially test membership RLS.
-- Back up and backfill groceries, meals, inventory, and budget data.
+- Deploy and adversarially test membership RLS before any screen cutover.
+- Back up and backfill groceries, meals, inventory, and budget data without modifying `app_state`.
 - Switch groceries to record-level tables/realtime behind a feature flag.
 - Add audit history, conflict-safe mutations, deletion/undo, and automated tests.
 

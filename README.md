@@ -4,7 +4,7 @@ Martel OS is a private, mobile-first family operating system. The current produc
 
 ## Architecture status
 
-The application is in a staged migration from a legacy shared JSON snapshot to household-scoped normalized records. The compatibility layer in `src/services/household-state` preserves the existing production behavior. Do not apply the design migration in `supabase/migrations` directly to production.
+The application is in a staged migration from a legacy shared JSON snapshot to household-scoped normalized records. The compatibility layer in `src/services/household-state` preserves the existing production behavior. The normalized migrations are additive, but must be applied in order and verified before any screen is switched away from `app_state`.
 
 Read these before changing the database:
 

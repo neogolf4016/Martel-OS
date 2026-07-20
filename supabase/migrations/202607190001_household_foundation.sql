@@ -1,5 +1,6 @@
--- DESIGN MIGRATION: review and test in an isolated Supabase branch before production.
--- It is intentionally additive and does not modify or delete public.app_state.
+-- Stage 1 of the additive normalized foundation. Apply migrations in timestamp
+-- order; 202607200001 completes household bootstrap and legacy backfill.
+-- This file does not modify or delete public.app_state.
 
 create extension if not exists pgcrypto;
 
@@ -167,6 +168,5 @@ create policy finance_adult_access on public.finance_transactions for all to aut
 using (public.has_household_role(household_id, array['owner','admin','adult']::public.household_role[]))
 with check (public.has_household_role(household_id, array['owner','admin','adult']::public.household_role[]));
 
--- Household creation and the first owner membership must be performed atomically by a
--- reviewed server-side function in the deployment migration. This design migration omits
--- that function intentionally so it cannot be applied casually to production.
+-- Household creation and the initial owner/admin membership are completed by
+-- 202607200001 after both established Auth users and the legacy backup are verified.
