@@ -12,6 +12,7 @@ export function useHouseholdState() {
   const supabase = configured ? getSupabaseBrowserClient() : null;
   const [data, setData] = useState<HouseholdSnapshot>(seedData);
   const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [syncState, setSyncState] = useState<SyncState>("loading");
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNextSave = useRef(true);
@@ -36,6 +37,7 @@ export function useHouseholdState() {
         .from("app_state").select("data").eq("household_key", householdKey).maybeSingle();
       if (cancelled) return;
       if (error) {
+        setLoadError("We couldn't securely load the family dashboard. Your saved information was not changed.");
         setSyncState("error");
         setReady(true);
         return;
@@ -104,5 +106,5 @@ export function useHouseholdState() {
     setData(previous => ({ ...previous, ...patch }));
   }, []);
 
-  return { configured, data, ready, setData, syncState, updateData };
+  return { configured, data, loadError, ready, setData, syncState, updateData };
 }

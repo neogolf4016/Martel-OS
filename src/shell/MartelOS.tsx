@@ -13,13 +13,18 @@ import { useHouseholdState } from "../services/household-state/use-household-sta
 import { getSupabaseBrowserClient } from "../services/supabase/browser";
 
 export function MartelOS({ initialUserEmail }: { initialUserEmail?: string | null }) {
-  const { configured, data, ready, setData, syncState, updateData } = useHouseholdState();
+  const { configured, data, loadError, ready, setData, syncState, updateData } = useHouseholdState();
   const [tab, setTab] = useState<ActiveModuleId>("home");
   async function signOut() {
     if (configured) await getSupabaseBrowserClient().auth.signOut();
     window.location.reload();
   }
   if (!ready) return <main className="loading-screen">Loading Martel Family Dashboard…</main>;
+  if (loadError) return <main className="error-screen"><section className="error-card" role="alert">
+    <p className="eyebrow dark">MARTEL OS</p><h1>Dashboard unavailable</h1><p>{loadError}</p>
+    <div className="error-actions"><button className="primary" onClick={() => window.location.reload()}>Try again</button>
+      {configured && <button className="secondary" onClick={() => void signOut()}>Sign out</button>}</div>
+  </section></main>;
   return <main>
     <header className="topbar"><div><p className="eyebrow">MARTEL FAMILY</p><h1>Family Dashboard</h1></div>
       <div className="header-actions"><span className={`sync-badge ${syncState}`} role="status">
