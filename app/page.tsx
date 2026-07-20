@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AuthPanel } from "../src/modules/auth/AuthPanel";
+import { isAllowedDashboardEmail } from "../src/core/access";
 import { MartelOS } from "../src/shell/MartelOS";
 import { getSupabaseBrowserClient, isSupabaseConfigured } from "../src/services/supabase/browser";
 
@@ -16,12 +17,12 @@ export default function Page() {
     const supabase = getSupabaseBrowserClient();
 
     supabase.auth.getUser().then(({ data }) => {
-      setEmail(data.user?.email || null);
+      setEmail(isAllowedDashboardEmail(data.user?.email) ? data.user?.email || null : null);
       setLoading(false);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setEmail(session?.user?.email || null);
+      setEmail(isAllowedDashboardEmail(session?.user?.email) ? session?.user?.email || null : null);
       setLoading(false);
     });
 
