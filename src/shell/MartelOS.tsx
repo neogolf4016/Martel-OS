@@ -10,10 +10,12 @@ import { MealsModule } from "../modules/meals/MealsModule";
 import type { ActiveModuleId } from "../modules/registry";
 import { SettingsModule } from "../modules/settings/SettingsModule";
 import { useHouseholdState } from "../services/household-state/use-household-state";
+import { useNormalizedFoundationStatus } from "../services/household-state/use-normalized-foundation-status";
 import { getSupabaseBrowserClient } from "../services/supabase/browser";
 
 export function MartelOS({ initialUserEmail }: { initialUserEmail?: string | null }) {
   const { configured, data, loadError, ready, setData, syncState, updateData } = useHouseholdState();
+  const normalizedStatus = useNormalizedFoundationStatus(configured);
   const [tab, setTab] = useState<ActiveModuleId>("home");
   async function signOut() {
     if (configured) await getSupabaseBrowserClient().auth.signOut();
@@ -36,7 +38,7 @@ export function MartelOS({ initialUserEmail }: { initialUserEmail?: string | nul
       {tab === "grocery" && <GroceryModule data={data} updateData={updateData}/>}
       {tab === "inventory" && <InventoryModule data={data} updateData={updateData}/>}
       {tab === "finance" && <FinanceModule data={data} updateData={updateData}/>}
-      {tab === "settings" && <SettingsModule configured={configured} data={data} email={initialUserEmail} setData={setData}/>}
+      {tab === "settings" && <SettingsModule configured={configured} data={data} email={initialUserEmail} normalizedStatus={normalizedStatus} setData={setData}/>}
     </section>
     <nav className="bottom-nav" aria-label="Primary navigation">
       <Nav active={tab === "home"} onClick={() => setTab("home")} icon={<Home/>} label="Home"/>

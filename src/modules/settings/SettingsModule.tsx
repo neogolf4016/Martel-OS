@@ -4,11 +4,18 @@ import type { ChangeEvent } from "react";
 import { Download, RefreshCcw, Upload } from "lucide-react";
 import type { HouseholdSnapshot } from "../../core/domain";
 import { mergeSnapshot, seedData } from "../../core/seed";
+import type { NormalizedFoundationStatus } from "../../services/household-state/use-normalized-foundation-status";
 import { PageTitle, Section } from "../../shared/ui";
 
-type Props = { configured: boolean; data: HouseholdSnapshot; email?: string | null; setData: (data: HouseholdSnapshot) => void };
+type Props = {
+  configured: boolean;
+  data: HouseholdSnapshot;
+  email?: string | null;
+  normalizedStatus: NormalizedFoundationStatus;
+  setData: (data: HouseholdSnapshot) => void;
+};
 
-export function SettingsModule({ configured, data, email, setData }: Props) {
+export function SettingsModule({ configured, data, email, normalizedStatus, setData }: Props) {
   function exportData() {
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -34,6 +41,13 @@ export function SettingsModule({ configured, data, email, setData }: Props) {
     <Section title="Connection"><div className="row"><div><strong>{configured ? "Supabase shared sync enabled" : "Local device mode"}</strong>
       <small>{configured ? `Signed in as ${email || "household user"}` : "Add the three environment variables to enable shared syncing."}</small></div>
       <span className={`pill ${configured ? "" : "warning"}`}>{configured ? "Connected" : "Offline"}</span></div></Section>
+    {configured && <Section title="Data foundation"><div className="row"><div>
+      <strong>{normalizedStatus.state === "ready" ? `${normalizedStatus.householdName} records verified` : normalizedStatus.state === "loading" ? "Verifying household records…" : "Household records unavailable"}</strong>
+      <small>{normalizedStatus.state === "ready"
+        ? `${normalizedStatus.groceries} groceries · ${normalizedStatus.inventory} inventory items · ${normalizedStatus.meals} meals`
+        : "The current dashboard remains on the protected compatibility data until verification is complete."}</small></div>
+      <span className={`pill ${normalizedStatus.state === "ready" ? "" : "warning"}`}>{normalizedStatus.state === "ready" ? "Ready" : normalizedStatus.state === "loading" ? "Checking" : "Protected"}</span>
+    </div></Section>}
     <Section title="Backups"><div className="settings-actions"><button className="secondary" onClick={exportData}><Download size={17}/> Export JSON</button>
       <label className="secondary"><Upload size={17}/> Import JSON<input hidden type="file" accept=".json,application/json" onChange={importData}/></label></div></Section>
     <Section title="Reset starter data"><button className="danger-button" onClick={() => { if (window.confirm("Reset the dashboard to the original Martel family starter data?")) setData(seedData); }}>
