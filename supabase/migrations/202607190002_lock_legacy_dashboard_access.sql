@@ -1,7 +1,7 @@
 -- Production-safe lock-down for the legacy app_state compatibility table.
 -- Only the two established Martel Auth accounts may access dashboard data.
-
-begin;
+-- Statements are intentionally idempotent and left unwrapped so this file can
+-- also be run safely through the Supabase dashboard SQL runner.
 
 create or replace function public.is_martel_dashboard_user()
 returns boolean
@@ -41,5 +41,3 @@ create policy "Martel users can update app state"
 on public.app_state for update to authenticated
 using (public.is_martel_dashboard_user())
 with check (public.is_martel_dashboard_user());
-
-commit;
