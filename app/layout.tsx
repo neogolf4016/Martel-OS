@@ -2,9 +2,10 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Martel Family Dashboard",
-  description: "Shared family meals, groceries, inventory, and budget",
-  manifest: "/manifest.webmanifest"
+  title: "Martel OS",
+  description: "A private operating system for the Martel family",
+  manifest: "/manifest.webmanifest",
+  robots: { index: false, follow: false, nocache: true }
 };
 
 export const viewport: Viewport = {

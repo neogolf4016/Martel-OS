@@ -1,118 +1,59 @@
-# Martel Family Dashboard
+# Martel OS
 
-A private mobile-first family dashboard with:
+Martel OS is a private, mobile-first family operating system. The current production slice includes shared meal planning, groceries, home inventory, food/household budgeting, Supabase authentication, realtime cross-device sync, and JSON backup/restore.
 
-- Shared meal planning
-- Shared grocery lists
-- Freezer, pantry, refrigerator, and household inventory
-- Grocery and household budget tracking
-- Supabase email/password authentication
-- Live cross-device syncing
-- JSON backup and restore
-- PWA-ready web app
-- Vercel deployment support
+## Architecture status
 
-The app is preloaded with the Martel family's meals and staple groceries.
+The application is in a staged migration from a legacy shared JSON snapshot to household-scoped normalized records. The compatibility layer in `src/services/household-state` preserves the existing production behavior. Do not apply the design migration in `supabase/migrations` directly to production.
 
-## 1. Upload to GitHub
+Read these before changing the database:
 
-Unzip this project.
+- `docs/architecture/ARCHITECTURE_REVIEW.md`
+- `docs/architecture/TARGET_ARCHITECTURE.md`
+- `docs/architecture/ROADMAP.md`
 
-In the GitHub repository, choose **Add file → Upload files**, then drag the **contents inside this folder** into the repository.
-
-The repository root should contain:
+## Repository structure
 
 ```text
-app/
-components/
-lib/
-public/
-supabase/
-package.json
-next.config.mjs
-tsconfig.json
+app/                    Next.js entry points and global styles
+src/core/               current shared domain model
+src/modules/            product modules
+src/services/           Supabase and state adapters
+src/shared/             shared UI primitives
+src/shell/              authenticated application shell
+supabase/schema.sql     current production-compatible schema
+supabase/migrations/    reviewed future migrations
+docs/architecture/      review, target design, and rollout plan
 ```
-
-Do not upload the outer folder as a single nested directory.
-
-## 2. Create the Supabase project
-
-Create a new Supabase project named **Martel Family Dashboard**.
-
-Open **SQL Editor**, create a new query, paste the contents of:
-
-```text
-supabase/schema.sql
-```
-
-Run the query.
-
-## 3. Get the Supabase values
-
-In Supabase open:
-
-**Project Settings → API**
-
-Copy:
-
-- Project URL
-- anon/public key
-
-You do not need to share the database password.
-
-## 4. Deploy with Vercel
-
-In Vercel:
-
-1. Choose **Add New → Project**
-2. Import `neogolf4016/Martel-Dashboard-Public`
-3. Add these environment variables:
-
-```text
-NEXT_PUBLIC_SUPABASE_URL=<your Supabase project URL>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<your Supabase anon/public key>
-NEXT_PUBLIC_HOUSEHOLD_KEY=<a long private random phrase>
-```
-
-Example household key:
-
-```text
-martel-family-2026-4f82c9-private
-```
-
-Use the same household key for the production, preview, and development environments.
-
-4. Deploy.
-
-## 5. Create the two family accounts
-
-Open the deployed website.
-
-Create one account for Allan and one for Stefanie.
-
-Because both accounts use the same Supabase project and household key, they will see the same dashboard data.
-
-If Supabase email confirmation is enabled, each person must confirm the signup email before signing in.
-
-## Important privacy note
-
-The GitHub repository is currently public. The source code does not contain passwords or Supabase keys, but a private repository is still preferable for a family dashboard.
-
-Never commit `.env.local` or paste service-role keys into GitHub.
-
-Only the public anon key belongs in Vercel. Never use the Supabase service-role key in this frontend app.
 
 ## Local development
 
-Copy `.env.example` to `.env.local`, then fill in the values.
+Copy `.env.example` to `.env.local`, fill in the public Supabase values, then run:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Without Supabase environment variables, the app uses browser storage in local-device mode.
 
-## Local fallback
+## Required environment variables
 
-If Supabase environment variables are missing, the app still runs in local device mode using browser storage. Shared syncing and login are disabled in that mode.
+```text
+NEXT_PUBLIC_SUPABASE_URL=<project URL>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<public anon key>
+NEXT_PUBLIC_HOUSEHOLD_KEY=<legacy compatibility key>
+```
+
+The household key is not a security credential. Current production RLS must be replaced with membership-based RLS before adding finance connections, documents, medical information, or any non-Martel user.
+
+Never expose a Supabase service-role key, bank provider secret, or OAuth client secret to the browser. Privileged integrations belong in server-side functions.
+
+## Verification
+
+```bash
+npm run typecheck
+npm run build
+```
+
+Before release, also complete the two-session grocery sync gates in the architecture review.

@@ -34,7 +34,8 @@ export type BudgetEntry = {
   category: "Groceries" | "Household";
 };
 
-export type AppData = {
+/** Legacy aggregate retained during the zero-downtime normalized-data migration. */
+export type HouseholdSnapshot = {
   meals: Meal[];
   weeklyPlan: Record<string, string>;
   groceries: GroceryItem[];
@@ -43,3 +44,5 @@ export type AppData = {
   monthlyBudget: number;
   updatedAt?: string;
 };
+
+export type SyncState = "loading" | "synced" | "saving" | "offline" | "error";
