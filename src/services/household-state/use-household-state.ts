@@ -16,6 +16,7 @@ export function useHouseholdState() {
   const [syncState, setSyncState] = useState<SyncState>("loading");
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNextSave = useRef(true);
+  const lastLocalWrite = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,11 +73,13 @@ export function useHouseholdState() {
     if (saveTimer.current) clearTimeout(saveTimer.current);
     setSyncState("saving");
     saveTimer.current = setTimeout(async () => {
-      const next = { ...data, updatedAt: new Date().toISOString() };
+      const updatedAt = new Date().toISOString();
+      const next = { ...data, updatedAt };
+      lastLocalWrite.current = updatedAt;
       const { error } = await supabase.from("app_state").upsert({
         household_key: householdKey,
         data: next,
-        updated_at: new Date().toISOString()
+        updated_at: updatedAt
       });
       setSyncState(error ? "error" : "synced");
     }, 600);
@@ -93,6 +96,10 @@ export function useHouseholdState() {
       payload => {
         const row = payload.new as { data?: HouseholdSnapshot };
         if (row?.data) {
+          if (row.data.updatedAt && row.data.updatedAt === lastLocalWrite.current) {
+            setSyncState("synced");
+            return;
+          }
           skipNextSave.current = true;
           setData(mergeSnapshot(row.data));
           setSyncState("synced");
