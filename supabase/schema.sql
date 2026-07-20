@@ -48,4 +48,10 @@ to authenticated
 using (public.is_martel_dashboard_user())
 with check (public.is_martel_dashboard_user());
 
-alter publication supabase_realtime add table public.app_state;
+do $$
+begin
+  alter publication supabase_realtime add table public.app_state;
+exception
+  when duplicate_object then null;
+end;
+$$;
