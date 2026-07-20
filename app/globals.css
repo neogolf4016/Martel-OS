@@ -127,6 +127,11 @@ select, input {
 .meal-body { padding: 0 15px 15px; color: var(--muted); }
 
 .add-bar { display: flex; gap: 10px; margin-bottom: 4px; }
+.undo-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin: 12px 0 4px; padding: 12px 14px; border: 1px solid var(--line);
+  border-radius: 14px; background: var(--card); box-shadow: var(--shadow);
+}
 .primary, .secondary, .danger-button {
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   white-space: nowrap; border-radius: 12px; padding: 12px 16px; font-weight: 800;
@@ -142,6 +147,11 @@ select, input {
 }
 .grocery-row.done .check-button { background: var(--brand); }
 .grocery-row.done strong { color: var(--muted); text-decoration: line-through; }
+.remove-button {
+  display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 auto;
+  border: 1px solid transparent; border-radius: 10px; color: var(--muted); background: transparent;
+}
+.remove-button:hover { color: var(--danger); border-color: #efcaca; background: #fff6f6; }
 
 .stepper { display: flex; align-items: center; gap: 7px; }
 .stepper button {
